@@ -1,0 +1,92 @@
+---
+title: "R Markdown for data exploration homework"
+output: github_document
+---
+
+## Setting up
+
+The data we'll analyze is contained in the `gapminder` R package. If not installed, run `install.packages("gapminder")` first.
+
+```{r}
+library(gapminder)
+```
+
+
+## Exploration of data frame
+
+### Basic info of the data frame
+Basic functions like `str`, `names`, `ncol`, `nrow`, `summary` help to get an overview of the data frame.
+
+```{r}
+str(gapminder) #explores the structure of the data
+
+```
+
+We have 6 variables: *country*, *continent*, *year*, *lifeExp* (life expentancy), *pop* (population), and *gdpPercap* (GDP per capita). Some are **numerical** and some are **categorical** (factors)
+
+We can also see the variables using the function `names`
+
+```{r}
+names(gapminder)
+```
+
+`ncol` and `nrow` will give us the number of columns and rows respectively
+
+```{r}
+ncol(gapminder)
+nrow(gapminder)
+```
+
+Perhaps the most useful basic function is `summary`
+
+```{r}
+summary(gapminder)
+```
+
+### Plots
+
+Plots help visualizing data,  we use `plot` to make basic graphs in R
+
+```{r}
+plot(lifeExp ~ year, gapminder)
+plot(lifeExp ~ gdpPercap, gapminder)
+```
+
+### Extracting columns or variables
+
+To specify a single variable from a data frame, use the dollar sign $. We can extract a single variable and save the data in a new vector (not very useful in this case though).
+
+```{r}
+LE <- gapminder$lifeExp # saves the vector of life expectancy
+```
+
+Now we know how to extract a variable, we can plot variables more easily.
+Lets try a couple more types of plots
+
+### Histograms
+Another basic kind of plot are the histograms, for these we use `hist`.
+Let’s explore the numeric variable for life expectancy.
+
+```{r}
+summary(gapminder$lifeExp)
+hist(gapminder$lifeExp)
+
+```
+
+### Bar plots
+
+Using `str` we see the variables *continent* and *country* are categorical (factors). We can try plotting the number of countries in each continent with a bar plot.
+
+```{r}
+str(gapminder$continent)
+barplot(table(gapminder$continent))
+```
+ 
+#### Boxplots
+
+Let's also try a `boxplot` to look at the life expentacy by continent. this shows the median, lower and upper quartiles and the max and min values.
+
+```{r}
+boxplot(gapminder$lifeExp ~ gapminder$continent)
+```
+
