@@ -295,7 +295,7 @@ c + geom_line()
 
 ``` r
 ggplot(gapminder, aes(year, lifeExp)) +
-  geom_line(aes(group = country), )
+  geom_line(aes(group = country), alpha=0.5)
 ```
 
 ![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-17-1.png)
@@ -311,11 +311,33 @@ Let's see how Rwanda's life expectancy and GDP per capita have evolved over time
 
 1.  Make a scatterplot. Store it in the variable `c`.
 
-2.  We want to connect the dots from earliest point to latest. What happens if we add the "line" geom to `c`?
+``` r
+c <- gapminder %>%
+  filter(country == "Rwanda") %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_point()
+c
+```
 
-3.  Add the appropriate geom to `c`. In that geom, specify a property of the geom: `arrow=arrow()`.
+![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-4.  Optional: git stage and commit
+1.  We want to connect the dots from earliest point to latest. What happens if we add the "line" geom to `c`?
+
+``` r
+c + geom_line()
+```
+
+![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-19-1.png)
+
+1.  Add the appropriate geom to `c`. In that geom, specify a property of the geom: `arrow=arrow()`.
+
+``` r
+c + geom_path(arrow=arrow())
+```
+
+![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-20-1.png)
+
+1.  Optional: git stage and commit
 
 **Uses of path plots**: The four "corners" of the plot usually indicate different qualities. This plot allows you to see how Rwanda (or some entity) evolves over these qualities.
 
@@ -336,8 +358,26 @@ How many countries are in each continent? Use the year 2007.
 
 1.  After filtering the gapminder data to 2007, make a bar chart of the number of countries in each continent. Store everything except the geom in the variable `d`.
 
-2.  Notice the y-axis. Oddly, `ggplot2` doesn't make it obvious how to change to proportion. Try adding a `y` aesthetic: `y=..count../sum(..count..)`.
+``` r
+d <- gapminder %>%
+  filter(year == 2007) %>%
+  ggplot(aes(continent))
+d + geom_bar()
+```
 
-3.  Optional: git stage, commit, and push!
+![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-21-1.png)
+
+1.  Notice the y-axis. Oddly, `ggplot2` doesn't make it obvious how to change to proportion. Try adding a `y` aesthetic: `y=..count../sum(..count..)`.
+
+``` r
+d <- gapminder %>%
+  filter(year == 2007) %>%
+  ggplot(aes(continent))
+d + geom_bar(aes(y = ..count../sum(..count..)))
+```
+
+![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-22-1.png)
+
+1.  Optional: git stage, commit, and push!
 
 **Uses of bar plots**: Get a sense of relative quantities of categories, or see the probability mass function of a categorical random variable.
