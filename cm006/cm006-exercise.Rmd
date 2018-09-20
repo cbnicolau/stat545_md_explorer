@@ -261,13 +261,27 @@ Let's see how Rwanda's life expectancy and GDP per capita have evolved over time
 
 1. Make a scatterplot. Store it in the variable `c`. 
 
+```{r}
+c <- gapminder %>%
+  filter(country == "Rwanda") %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_point()
+c
+```
 
 
 2. We want to connect the dots from earliest point to latest. What happens if we add the "line" geom to `c`?
 
+```{r}
+c + geom_line()
+```
 
 
 3. Add the appropriate geom to `c`. In that geom, specify a property of the geom: `arrow=arrow()`. 
+
+```{r}
+c + geom_path(arrow=arrow())
+```
 
 
 4. Optional: git stage and commit
