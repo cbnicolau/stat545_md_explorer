@@ -48,10 +48,9 @@ Notice the "metaprogramming" again! you dont need quotation marks around gapmind
 
 4. You _must_ remember to put the aesthetic mappings in the `aes` function! What happens if you forget?
 
-```{r}
 ggplot(gapminder, x=lifeExp, y=gdpPercap) + 
   geom_point()
-```
+it doesnt work, needs the aes() function
 
 aes function is needed (common source of error)
 
@@ -176,9 +175,8 @@ Let's hold off on identifying the grammar.
 1. Initiate the `ggplot` call to make a scatterplot of `continent` vs `pop`; initiate the log y scale. Store the call in the variable `b`.
 
 ```{r}
-a + geom_point(alpha=0.1) #aplpha is transparency here 1 is opaque
+a + geom_point(alpha=0.1) #aplpha is transparency where 1 is opaque
 ```
-
 
 2. Add the point geom to `b`. Why is this an ineffective plot?
 
@@ -241,14 +239,15 @@ gapminder %>%
 ```{r}
 c <- ggplot(gapminder, aes(year, lifeExp)) 
 c + geom_line()
-c + geom_line(aes(group=country), alpha=0.2)
+
 ```
 
 
 4. Use the `group` aesthetic to fix the problem.
 
 ```{r}
-
+ggplot(gapminder, aes(year, lifeExp)) +
+  geom_line(aes(group = country))
 ```
 
 
