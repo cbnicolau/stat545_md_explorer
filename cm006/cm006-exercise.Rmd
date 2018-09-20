@@ -304,11 +304,23 @@ How many countries are in each continent? Use the year 2007.
 
 2. After filtering the gapminder data to 2007, make a bar chart of the number of countries in each continent. Store everything except the geom in the variable `d`.
 
+```{r}
+d <- gapminder %>%
+  filter(year == 2007) %>%
+  ggplot(aes(continent))
+d + geom_bar()
+
+```
 
 
 3. Notice the y-axis. Oddly, `ggplot2` doesn't make it obvious how to change to proportion. Try adding a `y` aesthetic: `y=..count../sum(..count..)`.
 
-
+```{r}
+d <- gapminder %>%
+  filter(year == 2007) %>%
+  ggplot(aes(continent))
+d + geom_bar(aes(y = ..count../sum(..count..)))
+```
 
 4. Optional: git stage, commit, and push!
 
