@@ -247,7 +247,7 @@ c + geom_line()
 
 ```{r}
 ggplot(gapminder, aes(year, lifeExp)) +
-  geom_line(aes(group = country))
+  geom_line(aes(group = country), alpha=0.5)
 ```
 
 

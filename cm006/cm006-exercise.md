@@ -295,8 +295,7 @@ c + geom_line()
 
 ``` r
 ggplot(gapminder, aes(year, lifeExp)) +
-  geom_line() +
-  geom_line(aes(group = country))
+  geom_line(aes(group = country), )
 ```
 
 ![](cm006-exercise_files/figure-markdown_github/unnamed-chunk-17-1.png)
