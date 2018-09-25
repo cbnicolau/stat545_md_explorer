@@ -18,7 +18,7 @@ Switch focus to exploring aesthetic mappings, instead of geoms.
 - Try a scatterplot of `gdpPercap` vs `pop` with a categorical variable (continent) as `shape`.
 
 ```{r}
-gvsl <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
+gvsl <- ggplot(gapminder, aes(gdpPercap, lifeExp)) + # gvsl is gdpPercap versus lifeExp
   scale_x_log10()
 
 gvsl + geom_point((aes(shape=continent)))
@@ -30,11 +30,19 @@ gvsl + geom_point((aes(shape=continent)))
     - What's up with `pch`?
     
 ```{r}
-gvsl + geom_point(shape = 7)
-gvsl + geom_point(pch = 7)
-gvsl + geom_point(shape = "$")
+gvsl + geom_point(shape=24)
+
 ```
     
+```{r}
+gvsl + geom_point(pch=24)
+
+```
+
+```{r}
+gvsl + geom_point(shape = "$")
+```
+
 
 List of shapes can be found [at the bottom of the `scale_shape` documentation](https://ggplot2.tidyverse.org/reference/scale_shape.html).
 
@@ -134,7 +142,6 @@ gvsl + geom_point(aes(size=pop, colour=continent)) +
 ```
 
 
-
 # Continue from last time (geom exploration with `x` and `y` aesthetics)
 
 ## Path plots
@@ -145,6 +152,13 @@ Let's see how Rwanda's life expectancy and GDP per capita have evolved over time
 - Add `arrow=arrow()` option.
 - Add `geom_text`, with year label. 
 
+```{r}
+gapminder %>%
+  filter(country == "Rwanda") %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_path(arrow=arrow()) +
+  geom_text(aes(label=year))
+```
 
 ## Two categorical variables
 
@@ -190,6 +204,12 @@ __Uses of bar plots__: Get a sense of relative quantities of categories, or see 
 If you'd like some practice, give these exercises a try
 
 __Exercise 1__: Make a plot of `year` (x) vs `lifeExp` (y), with points coloured by continent. Then, to that same plot, fit a straight regression line to each continent, without the error bars. If you can, try piping the data frame into the `ggplot` function.
+
+```{r}
+ggplot(gapminder, aes(year, lifeExp)) +
+  geom_point()
+```
+
 
 __Exercise 2__: Repeat Exercise 1, but switch the _regression line_ and _geom\_point_ layers. How is this plot different from that of Exercise 1?
 
