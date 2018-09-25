@@ -149,12 +149,22 @@ gvsl + geom_point(aes(size=pop, colour=continent)) +
 Let's see how Rwanda's life expectancy and GDP per capita have evolved over time, using a path plot.
 
 - Try `geom_line()`. Try `geom_point()`.
+
+```{r}
+gapminder %>%
+  filter(country == "Rwanda") %>% #filter Rwanda data only
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_line()
+```
+
+
 - Add `arrow=arrow()` option.
 - Add `geom_text`, with year label. 
 
 ```{r}
 gapminder %>%
-  filter(country == "Rwanda") %>%
+  filter(country == "Rwanda") %>% #filter Rwanda data only
+  arrange(year) %>%
   ggplot(aes(gdpPercap, lifeExp)) +
   geom_path(arrow=arrow()) +
   geom_text(aes(label=year))
@@ -166,7 +176,19 @@ Try `cyl` (number of cylinders) ~ `am` (transmission) in the `mtcars` data frame
 
 - Scatterplot? Jitterplot? No.
 - `geom_count()`.
+
+```{r}
+ggplot(mtcars, aes(cyl, am)) +
+  geom_count()
+```
+
 - `geom_bin2d()`. Compare with `geom_tile()` with `fill` aes.
+
+```{r}
+ggplot(mtcars, aes(factor(cyl), factor(am))) +
+  geom_bin2d()
+```
+
 
 ## Overplotting
 
@@ -174,8 +196,27 @@ Try a scatterplot with:
 
 - Alpha transparency.
 - `geom_hex()`
+
+```{r}
+gvsl + geom_hex()
+# needed to install a new package, in the console use install.packages("hexbin")
+```
+
+
 - `geom_density2d()`
+
+```{r}
+gvsl + geom_density2d()
+```
+
+
 - `geom_smooth()`
+
+```{r}
+gvsl + geom_point(alpha=0.1) +
+  geom_smooth() # adds a regression smoother
+```
+
 
 
 ## Bar plots
@@ -184,6 +225,12 @@ How many countries are in each continent? Use the year 2007.
 
 1. After filtering the gapminder data to 2007, make a bar chart of the number of countries in each continent. Store everything except the geom in the variable `d`.
 
+```{r}
+gapminder %>%
+  filter(year==2007) %>%
+  ggplot(aes(x=continent)) + #automatically counts the number of rows and there is one row per country
+  geom_bar()
+```
 
 
 2. Notice the y-axis. Oddly, `ggplot2` doesn't make it obvious how to change to proportion. Try adding a `y` aesthetic: `y=..count../sum(..count..)`.
@@ -197,6 +244,12 @@ __Uses of bar plots__: Get a sense of relative quantities of categories, or see 
 ## Polar coordinates
 
 - Add `coord_polar()` to a scatterplot.
+
+```{r}
+gvsl + geom_point() +
+  coord_polar() # useful for degrees (geological info for example)
+```
+
 
 
 # Want more practice?
