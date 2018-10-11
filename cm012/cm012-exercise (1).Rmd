@@ -3,7 +3,7 @@ title: "cm012 Exercises: Factors"
 output: github_document
 ---
 
-`forcats` package comes loaded with `tiyverse`:
+`forcats` package comes loaded with `tidyverse`:
 
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
@@ -29,6 +29,7 @@ Examples of Base R's obsession with coercing to factors:
 ```{r}
 data.frame(x=c("A", "B")) %>% 
   str()
+
 ```
 
 
@@ -46,11 +47,20 @@ Examples of problems encountered with factors. (ideas came from [R Bloggers](htt
 
 ```{r}
 iris %>% 
-  mutate(Species = ifelse(Species == "versicolor", "vers", Species))
+  mutate(Species = ifelse(Species == "versicolor", "vers", Species)) %>%
+  str()
 ```
 
 ```{r}
 c(iris$Species, "setosa")
+```
+
+These are examples where R is not doing what we want because we are dealing with vectors.
+when encontering problems like this check if the database has factors in them
+
+
+```{r}
+as.character(iris$Species) #to transform the factors to character strings
 ```
 
 
@@ -70,7 +80,12 @@ set.seed(10)
 Convert `draw` to a factor. What are the levels? How many are there? How many of each category was drawn?
 
 ```{r}
+draw <- factor(draw)
+draw
 
+levels(draw)
+nlevels(draw)
+fct_count(draw)
 ```
 
 
@@ -79,7 +94,9 @@ Convert `draw` to a factor. What are the levels? How many are there? How many of
 We saw that `c()` doesn't work for concatenating. Modify the following code to use `fct_c()` from the `forcats` package:
 
 ```{r}
-c(lotr1$Film, lotr2$Film)
+c(lotr1$Film, lotr2$Film) #trying to bind Films from first data frame to films in 2nd data frame, doesn't work
+
+fct_c(lotr1$Film, lotr2$Film) #using the forcats package and this function it does work
 ```
 
 Try binding by row `lotr1` and `lotr2`:
@@ -90,7 +107,12 @@ Try binding by row `lotr1` and `lotr2`:
 Which one is more lenient? Which would you prefer?
 
 ```{r}
-
+rbind(lotr1, lotr2) #does what we expect, keeping the name of the film as factor
+rbind(lotr1, lotr2) %>% str()
+```
+```{r}
+bind_rows(lotr1, lotr2) #it does what we want but prints a warning that converted the name of the film that was a factor into a character vector
+bind_rows(lotr1, lotr2) %>% str()
 ```
 
 
@@ -99,8 +121,10 @@ Which one is more lenient? Which would you prefer?
 Levels don't always have to be present ("observed") in the factor. Example of what this means:
 
 ```{r}
-gap_gs <- gapminder %>% filter(country %in% c("Germany", "Sweden"))
+gap_gs <- gapminder %>% 
+  filter(country %in% c("Germany", "Sweden"))
 nlevels(gap_gs$country)
+levels(gap_gs$country) #all levels are still there, although they don't appear in our subset 
 ```
 
 
@@ -118,8 +142,18 @@ gap_small <- gapminder %>%
 Exercise: Make a bar chart of the number of times a continent has a country with population < 250,000 in the `gapminder` data set. Try with and without `scale_x_discrete(drop=FALSE)`.
 
 ```{r}
-
+ggplot(gap_small, aes(continent)) +
+         geom_bar()
+       
 ```
+
+```{r}
+ggplot(gap_small, aes(continent)) +
+  geom_bar() +
+  scale_x_discrete(drop=FALSE) #by adding this it prevents R from dropping the unused factors
+  
+```
+
 
 __Example of when it's bad__: If you ever use the `levels()` function.
 
@@ -135,7 +169,13 @@ Exercise: get rid of the unused factor levels for country and continent in diffe
 - Re-defining the variable as a factor
 
 ```{r}
-
+gap_small %>%
+  droplevels()
+```
+```{r}
+gap_small %>%
+  mutate(continent = fct_drop(continent)) %>%
+  str()
 ```
 
 
@@ -150,7 +190,7 @@ levels(cont)
 
 Plotting happens in the order of the factor levels:
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=5, fig.height=2.5}
 qplot(cont)
 ```
 
@@ -163,13 +203,25 @@ Reorder by frequency:
 - Rearrange by frequency: `fct_infreq()`.
 - Reverse: `fct_rev()` 
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=5, fig.height=2.5}
 cont %>% 
-  fct_infreq() %>% 
+  fct_infreq() %>% #reorders the levels based on how often they appear
   qplot()
 ```
 
 Could also arrange by the order they appear in the factor with `fct_inorder()`.
+
+```{r, fig.width=5, fig.height=2.5}
+cont %>% 
+  fct_infreq() %>% #reorders the levels based on how often they appear
+  fct_rev() %>% #reverses the order
+  qplot()
+```
+
+```{r}
+draw %>% fct_inorder() #reorders the factors by their appearance in the df
+```
+
 
 ### Ordering by Another Variable
 
@@ -183,13 +235,16 @@ ggplot(gap_asia_2007, aes(lifeExp, country)) + geom_point()
 
 Let's use `fct_reorder()` to reorder the countries of `gap_asia_2007` by life Expectancy, and produce the same plot:
 
-```{r, fig.width=2, fig.height=1}
-
+```{r}
+gapminder %>% 
+  mutate(country = fct_reorder(country, lifeExp)) %>%
+  ggplot(aes(lifeExp, country)) + 
+  geom_point()
 ```
 
 What about when life Expectancy is not unique? Example: life expectancy of each continent:
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=5, fig.height=5}
 ggplot(gapminder, aes(continent, lifeExp)) +
   geom_violin()
 ggplot(gapminder, aes(continent, lifeExp)) +
@@ -200,8 +255,11 @@ ggplot(gapminder, aes(continent, lifeExp)) +
 
 Exercise: Try making the above box plot and violin plots, ordered by median lifeExp. Try other functions to order by by modifying the `.fun` argument.
 
-```{r, fig.width=2, fig.height=1}
-
+```{r, fig.width=5, fig.height=5}
+gapminder %>%
+  mutate(continent = fct_reorder(continent, lifeExp)) %>%
+  ggplot(aes(continent, lifeExp)) +
+  geom_boxplot()
 ```
 
 
@@ -223,8 +281,11 @@ Use `fct_reorder2(f, x, y)` to reorder factor `f`:
 
 Exercise: Reorder the above line graph so that the legend is in order of last life expectancy. Useful for black-and-white printing!
 
-```{r, fig.width=2, fig.height=1}
-
+```{r, fig.width=7, fig.height=5}
+gap_select  %>% 
+  mutate(country = fct_reorder2(country, year, lifeExp)) %>% 
+  ggplot(aes(year, lifeExp)) +
+  geom_line(aes(colour=country))
 ```
 
 ### Ordering "because I said so"
@@ -242,6 +303,14 @@ gap_asia_2007$country %>%
   levels() %>% 
   head()
 ```
+
+```{r}
+gap_asia_2007$country %>% 
+  fct_relevel("Syria", "Sweden", after=2) %>% 
+  levels() %>% 
+  head()
+```
+
 
 ## Re-coding a Factor
 
@@ -269,7 +338,7 @@ gap_2007 <- gapminder %>%
 
 We can arbitrarily combine levels using `fct_collapse()`. For example, combine Europe and Asia into one factor called "combo":
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=5, fig.height=2.5}
 cont %>% 
   fct_collapse("combo" = c("Europe", "Asia")) %>% 
   qplot()
@@ -282,8 +351,10 @@ More practically, we can lump the least frequent levels together as "Other". Mod
 - You let `fct_lump()` decide on the number of non-other continents. How is this chosen?
 - Note: you can manually specify non-other levels using `fct_other()`.
 
-```{r, fig.width=2, fig.height=1}
-
+```{r, fig.width=5, fig.height=2}
+cont %>% 
+  fct_lump(n=2) %>% #keep the 2 moste frequent levels and then lump together all the rest 
+  qplot()
 ```
 
 We can use the `w` argument to lump by another variable.
@@ -293,7 +364,7 @@ Exercise: Modify the following violin plot of life expectancies of African count
 1. There are 4 "violins" corresponding to countries with the highest lifeExp.
 2. There are 4 "violins" corresponding to countries with the highest gdpPercap
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=10, fig.height=5}
 gap_africa <- gapminder %>% 
     filter(continent == "Africa")
 gap_africa %>% 
@@ -341,7 +412,8 @@ Goal here: some exposure to `lubridate`; know it exists.
 1. Use different combinations of y, m, d to make a date time object.
 
 ```{r}
-
+lubridate::ymd(170511)
+lubridate::ymd("2017-May-11")
 ```
 
 2. Get `year`, `month`, `yday`, `wday`, `day`.
