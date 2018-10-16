@@ -6,19 +6,22 @@ output: github_document
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
 library(gapminder)
+library(plotly)
+library(scales)
 ```
 
 
 # Saving Graphs to File
 
-- Don't use the mouse
-- Use `ggsave` for ggplot
+- Don't use the mouse: copying and pasting lines 19-20 in the console and it will show up in the plots viewer and then click exprot and save it
+- Use `ggsave` for ggplot: this is better or reproducibility
     - Practice by saving the following plot to file: 
 
 ```{r}
-ggplot(mtcars, aes(hp, wt)) + 
+p <- ggplot(mtcars, aes(hp, wt)) + 
     geom_point()
-ggsave(FILENAME_HERE, PLOT_OBJECT_HERE)
+#ggsave(FILENAME_HERE, PLOT_OBJECT_HERE)
+ggsave("myplot.png", p)
 ```
 
 - Base R way: print plots "to screen", sandwiched between `pdf()`/`jpeg()`/`png()`... and `dev.off()`. 
@@ -38,50 +41,67 @@ p_scales <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
      geom_point(aes(colour=pop), alpha=0.2)
 p_scales + 
     scale_x_log10() +
-    scale_colour_continuous(trans="log10")
+    scale_colour_continuous(trans="log10") #scale color log 10
 ```
 
 1. Change the y-axis tick mark spacing to 10; change the colour spacing to include all powers of 10.
+
+```{r}
+#p_scales +
+    #scale_x_log10() +
+    #scale_colour_continuous(
+        #trans  = "log10", 
+        #breaks = FILL_IN_BREAKS
+    #) +
+    #FILL_IN_SCALE_FUNCTION(breaks=FILL_IN_BREAKS)
+```
 
 ```{r}
 p_scales +
     scale_x_log10() +
     scale_colour_continuous(
         trans  = "log10", 
-        breaks = FILL_IN_BREAKS
+        breaks = 10^(1:10) #indicating the tickmarks we want to add
     ) +
-    FILL_IN_SCALE_FUNCTION(breaks=FILL_IN_BREAKS)
+    scale_y_continuous(breaks= 1:10 * 10) #add tick marks
 ```
+
 
 2. Specify `scales::*_format` in the `labels` argument of a scale function to do the following:
     - Change the x-axis labels to dollar format (use `scales::dollar_format()`)
     - Change the colour labels to comma format (use `scales::comma_format()`)
 
 ```{r}
+#install.packages("scales")
 library(scales)
 p_scales +
-    scale_x_log10(labels=FILL_THIS_IN) +
+    scale_x_log10(labels=dollar_format()) +
     scale_colour_continuous(
         trans  = "log10", 
         breaks = 10^(1:10),
-        labels = FILL_THIS_IN
+        labels =comma_format()
     ) +
     scale_y_continuous(breaks=10*(1:10))
+
 ```
 
+ - can run `colors()` function in the console to see the color options
+
 3. Use `RColorBrewer` to change the colour scheme.
-    - Notice the three different types of scales: sequential, diverging, and continuous.
+    - Notice the three different types of scales: sequential (darkness of the color indicates), diverging (positives and negative values), and continuous.
+   
 
 ```{r}
 ## All palettes the come with RColorBrewer:
+#install.packages("RColorBrewer")
 RColorBrewer::display.brewer.all()
 p_scales +
     scale_x_log10(labels=dollar_format()) +
-    FILL_IN_WITH_RCOLORBREWER(
+    scale_color_distiller(
         trans   = "log10",
         breaks  = 10^(1:10),
         labels  = comma_format(),
-        palette = FILL_THIS_IN
+        palette = "Greens"
     ) +
     scale_y_continuous(breaks=10*(1:10))
 ```
@@ -93,12 +113,10 @@ p_scales +
 ```{r}
 p_scales +
     scale_x_log10(labels=dollar_format()) +
-    FILL_IN_WITH_RCOLORBREWER(
+    scale_color_viridis_c(
         trans   = "log10",
         breaks  = 10^(1:10),
-        labels  = comma_format(),
-        palette = FILL_THIS_IN
-    ) +
+        labels  = comma_format()) +
     scale_y_continuous(breaks=10*(1:10))
 ```
 
@@ -116,7 +134,8 @@ ggplot(iris, aes(Sepal.Width, Sepal.Length)) +
      geom_point() +
      labs(x = "Sepal Width",
           y = "Sepal Length",
-          title = "Sepal sizes of three plant species")
+          title = "Sepal sizes of three plant species") +
+  theme_light()
 ```
 
 2. Then, change font size of axis labels, and the strip background colour. Others?
@@ -129,8 +148,8 @@ ggplot(iris, aes(Sepal.Width, Sepal.Length)) +
           y = "Sepal Length",
           title = "Sepal sizes of three plant species") +
     theme_bw() +
-    theme(FILL_IN_ARG_FOR_AXIS_TITLE = FILL_THIS_IN,
-          strip.background = FILL_THIS_IN)
+    theme(axis.text = element_text(size = 16),
+          strip.background = element_rect(fill = "green"))
 ```
 
 
@@ -158,7 +177,10 @@ Consider the following plot:
 1. Convert it to a `plotly` object by applying the `ggplotly()` function:
 
 ```{r}
-FILL_THIS_IN
+#install.packages("plotly")
+library(plotly)
+
+ggplotly(p)
 ```
 
 2. You can save a plotly graph locally as an html file. Try saving the above:
@@ -167,13 +189,15 @@ FILL_THIS_IN
 ```{r}
 p %>% 
     ggplotly() %>% 
-    htmlwidgets::saveWidget("LOCATION_GOES_HERE")
+    htmlwidgets::saveWidget("my_plotly.html")
 ```
 
 
 3. Run this code to see the json format underneath:
 
 ```{r}
+#install.packages("plotly-json")
+
 p %>% 
     ggplotly() %>% 
     plotly_json()
@@ -199,7 +223,7 @@ plot_ly(gapminder,
 plot_ly(gapminder, 
         x = ~gdpPercap, 
         y = ~lifeExp, 
-        z = FILL_THIS_IN,
+        z = ~pop,
         type = "scatter3d",
         mode = "markers",
         opacity = 0.2)
